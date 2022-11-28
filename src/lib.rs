@@ -15,13 +15,13 @@ fn w<T: Copy, O>(binop: &dyn Fn(T, T) -> O) -> impl Fn(T) -> O + '_ {
 
 // pub trait Iterscans : Iterator {
 //     fn scan_while(self, f: F) {}
-//     fn scan() {}
-//     fn prescan_while() {}
-//     fn pres
+//     fn scan_(self, f: F) {}
+//     fn prescan_while(self, init: T, f: F) {}
+//     fn prescan(self, init: T, f: F) {}
 // }
 
 pub trait Iterscans: Iterator {
-    fn prescan<F>(self, f: F) -> Prescan<Self, Self::Item, F>
+    fn scan_<F>(self, f: F) -> Prescan<Self, Self::Item, F>
     where
         Self: Sized,
         F: FnMut(&Self::Item, &Self::Item) -> Self::Item,
@@ -104,11 +104,7 @@ mod tests {
 
     #[test]
     fn test_scanl1() {
-        // TODO get &Add::add working
-        assert_equal(
-            vec![1, 1, 1].into_iter().prescan(|x, y| x + y),
-            vec![1, 2, 3],
-        );
-        assert_equal((1..=5).prescan(|x, y| x + y), vec![1, 3, 6, 10, 15]);
+        assert_equal(vec![1, 1, 1].into_iter().scan_(|x, y| x + y), vec![1, 2, 3]);
+        assert_equal((1..=5).scan_(|x, y| x + y), vec![1, 3, 6, 10, 15]);
     }
 }
