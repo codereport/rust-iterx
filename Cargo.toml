@@ -4,6 +4,7 @@ version = "0.0.1"
 authors = ["Conor Hoekstra"]
 edition = "2021"
 license = "MIT"
+description = "Rust library that provides several functions on the Iterator trait not found in std::iter or Itertools."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
