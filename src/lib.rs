@@ -24,16 +24,15 @@ fn w<T: Copy, O>(binop: &dyn Fn(T, T) -> O) -> impl Fn(T) -> O + '_ {
 mod tests {
     use super::*;
 
+    use itertools::assert_equal;
+
     #[test]
     fn test_scan_not_what_i_want() {
         let input = vec![1, 1, 1];
         let expected = vec![1, 2, 3];
-        assert_eq!(
-            input
-                .into_iter()
-                .scan(0, &option_lift(&|a, b| *a + b))
-                .collect::<Vec<_>>(),
-            expected
+        assert_equal(
+            input.into_iter().scan(0, &option_lift(&|a, b| *a + b)),
+            expected,
         );
     }
 
