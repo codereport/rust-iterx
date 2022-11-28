@@ -19,7 +19,7 @@ fn w<T: Copy, O>(binop: &dyn Fn(T, T) -> O) -> impl Fn(T) -> O + '_ {
 //     ✅ fn scan_while(self, f: F) {}
 //     ✅ fn scan_(self, f: F) {}
 //     fn prescan_while(self, init: T, f: F) {}
-//     fn prescan(self, init: T, f: F) {}
+//     ✅ fn prescan(self, init: T, f: F) {}
 // }
 
 pub trait Iterscans: Iterator {
