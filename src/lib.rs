@@ -21,14 +21,14 @@ fn w<T: Copy, O>(binop: &dyn Fn(T, T) -> O) -> impl Fn(T) -> O + '_ {
 // 3. Push to crates.io
 // 4. Use in rust-tx
 
-// pub trait Iterscans : Iterator {
+// pub trait Iterx : Iterator {
 //     ✅ fn scan_while(self, f: F) {}
 //     ✅ fn scan_(self, f: F) {}
 //     fn prescan_while(self, init: T, f: F) {}
 //     ✅ fn prescan(self, init: T, f: F) {}
 // }
 
-pub trait Iterscans: Iterator {
+pub trait Iterx: Iterator {
     // Name scan_ so as to not collide with std::iter::Iterator::scan
     // std::iter::Iterator::scan should really be scan_while
     fn scan_<F>(self, f: F) -> Scan_<Self, Self::Item, F>
@@ -57,7 +57,7 @@ pub trait Iterscans: Iterator {
     }
 }
 
-impl<T: ?Sized> Iterscans for T where T: Iterator {}
+impl<T: ?Sized> Iterx for T where T: Iterator {}
 
 #[derive(Clone)]
 pub struct Prescan<I, St, F> {
