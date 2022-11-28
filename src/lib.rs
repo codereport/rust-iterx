@@ -23,7 +23,7 @@ fn w<T: Copy, O>(binop: &dyn Fn(T, T) -> O) -> impl Fn(T) -> O + '_ {
 // }
 
 pub trait Iterscans: Iterator {
-    // Name scan_ so as to not collide with std::iter::Iterator::sc an
+    // Name scan_ so as to not collide with std::iter::Iterator::scan
     // std::iter::Iterator::scan should really be scan_while
     fn scan_<F>(self, f: F) -> Prescan<Self, Self::Item, F>
     where
