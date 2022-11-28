@@ -1,3 +1,5 @@
+use std::iter::Scan;
+
 #[cfg(test)]
 use std::ops::Add;
 
@@ -14,19 +16,30 @@ fn w<T: Copy, O>(binop: &dyn Fn(T, T) -> O) -> impl Fn(T) -> O + '_ {
 }
 
 // pub trait Iterscans : Iterator {
-//     fn scan_while(self, f: F) {}
-//     fn scan_(self, f: F) {}
+//     ✅ fn scan_while(self, f: F) {}
+//     ✅ fn scan_(self, f: F) {}
 //     fn prescan_while(self, init: T, f: F) {}
 //     fn prescan(self, init: T, f: F) {}
 // }
 
 pub trait Iterscans: Iterator {
+    // Name scan_ so as to not collide with std::iter::Iterator::sc an
+    // std::iter::Iterator::scan should really be scan_while
     fn scan_<F>(self, f: F) -> Prescan<Self, Self::Item, F>
     where
         Self: Sized,
         F: FnMut(&Self::Item, &Self::Item) -> Self::Item,
     {
         Prescan::new(self, f)
+    }
+
+    // A renaming of https://doc.rust-lang.org/src/core/iter/traits/iterator.rs.html#1420
+    fn scan_while<St, B, F>(self, initial_state: St, f: F) -> Scan<Self, St, F>
+    where
+        Self: Sized,
+        F: FnMut(&mut St, Self::Item) -> Option<B>,
+    {
+        self.scan(initial_state, f)
     }
 }
 
@@ -92,7 +105,9 @@ mod tests {
         let input = vec![1, 1, 1];
         let expected = vec![1, 2, 3];
         assert_equal(
-            input.into_iter().scan(0, &option_lift(&|a, b| *a + b)),
+            input
+                .into_iter()
+                .scan_while(0, &option_lift(&|a, b| *a + b)),
             expected,
         );
     }
