@@ -20,6 +20,67 @@ fn w<T: Copy, O>(binop: &dyn Fn(T, T) -> O) -> impl Fn(T) -> O + '_ {
 //     fn pres
 // }
 
+pub trait Iterscans: Iterator {
+    fn prescan<F>(self, f: F) -> Prescan<Self, Self::Item, F>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Item, &Self::Item) -> Self::Item,
+    {
+        Prescan::new(self, f)
+    }
+}
+
+impl<T: ?Sized> Iterscans for T where T: Iterator {}
+
+#[derive(Clone)]
+pub struct Prescan<I, T, F> {
+    iter: I,
+    f: F,
+    state: Option<T>,
+    is_first: bool,
+}
+
+impl<I, T, F> Prescan<I, T, F>
+where
+    I: Iterator<Item = T>,
+{
+    fn new(iter: I, f: F) -> Self {
+        Self {
+            iter,
+            f,
+            state: None,
+            is_first: true,
+        }
+    }
+}
+
+impl<I, T, F> Iterator for Prescan<I, T, F>
+where
+    I: Iterator<Item = T>,
+    F: FnMut(&T, &T) -> T,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.is_first {
+            self.state = Some(self.iter.next())?;
+            self.is_first = false;
+        }
+
+        let state = self.state.take()?;
+
+        if let Some(x) = self.iter.next() {
+            self.state = Some((self.f)(&state, &x));
+        }
+
+        Some(state)
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -39,5 +100,15 @@ mod tests {
     #[test]
     fn test_w_combinator() {
         assert_eq!(w(&Add::add)(1), 2);
+    }
+
+    #[test]
+    fn test_scanl1() {
+        // TODO get &Add::add working
+        assert_equal(
+            vec![1, 1, 1].into_iter().prescan(|x, y| x + y),
+            vec![1, 2, 3],
+        );
+        assert_equal((1..=5).prescan(|x, y| x + y), vec![1, 3, 6, 10, 15]);
     }
 }
