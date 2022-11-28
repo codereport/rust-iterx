@@ -102,13 +102,11 @@ mod tests {
 
     #[test]
     fn test_scan_not_what_i_want() {
-        let input = vec![1, 1, 1];
-        let expected = vec![1, 2, 3];
         assert_equal(
-            input
+            vec![1, 1, 1]
                 .into_iter()
                 .scan_while(0, &option_lift(&|a, b| *a + b)),
-            expected,
+            1..=3,
         );
     }
 
@@ -119,7 +117,7 @@ mod tests {
 
     #[test]
     fn test_scanl1() {
-        assert_equal(vec![1, 1, 1].into_iter().scan_(|x, y| x + y), vec![1, 2, 3]);
+        assert_equal(vec![1, 1, 1].into_iter().scan_(|x, y| x + y), 1..=3);
         assert_equal((1..=5).scan_(|x, y| x + y), vec![1, 3, 6, 10, 15]);
     }
 }
