@@ -15,6 +15,12 @@ fn w<T: Copy, O>(binop: &dyn Fn(T, T) -> O) -> impl Fn(T) -> O + '_ {
     |x| binop(x, x)
 }
 
+// TODO
+// 1. Figure out &Add::add
+// 2. Think about generalizing library (zip_map)
+// 3. Push to crates.io
+// 4. Use in rust-tx
+
 // pub trait Iterscans : Iterator {
 //     ✅ fn scan_while(self, f: F) {}
 //     ✅ fn scan_(self, f: F) {}
@@ -92,6 +98,7 @@ where
         (lb + 1, ub.map(|ub| ub + 1))
     }
 }
+
 #[derive(Clone)]
 pub struct Scan_<I, T, F> {
     iter: I,
@@ -164,12 +171,14 @@ mod tests {
 
     #[test]
     fn test_scan_() {
+        assert_equal(vec![1].into_iter().scan_(|x, y| x + y), 1..2);
         assert_equal(vec![1, 1, 1].into_iter().scan_(|x, y| x + y), 1..=3);
         assert_equal((1..=5).scan_(|x, y| x + y), vec![1, 3, 6, 10, 15]);
     }
 
     #[test]
     fn test_prescan() {
+        assert_equal(vec![1].into_iter().prescan(0, |x, y| x + y), 0..=1);
         assert_equal(vec![1, 1, 1].into_iter().prescan(0, |x, y| x + y), 0..=3);
         assert_equal((1..=5).prescan(0, |x, y| x + y), vec![0, 1, 3, 6, 10, 15]);
     }
