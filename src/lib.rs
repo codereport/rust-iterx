@@ -1,4 +1,4 @@
-use std::iter::Scan;
+use std::iter::{Map, Scan, Zip};
 
 #[cfg(test)]
 use std::ops::Add;
@@ -17,9 +17,7 @@ fn w<T: Copy, O>(binop: &dyn Fn(T, T) -> O) -> impl Fn(T) -> O + '_ {
 
 // TODO
 // 1. Figure out &Add::add
-// 2. Think about generalizing library (zip_map)
-// 3. Push to crates.io
-// 4. Use in rust-tx
+// 2. Use in rust-tx
 
 // pub trait Iterx : Iterator {
 //     ✅ fn scan_while(self, f: F) {}
@@ -35,6 +33,7 @@ pub trait Iterx: Iterator {
     where
         Self: Sized,
         F: FnMut(&Self::Item, &Self::Item) -> Self::Item,
+        // F: FnMut(&Self::Item, &Self::Item) -> Self::Item,
     {
         Scan_::new(self, f)
     }
@@ -54,6 +53,23 @@ pub trait Iterx: Iterator {
         F: FnMut(&St, &Self::Item) -> St,
     {
         Prescan::new(self, initial_state, f)
+    }
+
+    fn zip_map<U, T, F>(
+        self,
+        other: U,
+        f: F,
+    ) -> Map<
+        Zip<Self, U::IntoIter>,
+        Box<dyn Fn((<Self as Iterator>::Item, <U as IntoIterator>::Item)) -> T>,
+    >
+    where
+        Self: Sized,
+        U: IntoIterator,
+        F: Fn(<Self as Iterator>::Item, <U as IntoIterator>::Item) -> T + 'static,
+    {
+        self.zip(other.into_iter())
+            .map(Box::new(move |(x, y)| f(x, y)))
     }
 }
 
@@ -181,5 +197,11 @@ mod tests {
         assert_equal(vec![1].into_iter().prescan(0, |x, y| x + y), 0..=1);
         assert_equal(vec![1, 1, 1].into_iter().prescan(0, |x, y| x + y), 0..=3);
         assert_equal((1..=5).prescan(0, |x, y| x + y), vec![0, 1, 3, 6, 10, 15]);
+    }
+
+    #[test]
+    fn test_zip_map() {
+        assert_equal((1..5).zip_map(1..5, |a, b| a + b), vec![2, 4, 6, 8]);
+        assert_equal((1..5).zip_map(1..5, |a, b| a * b), vec![1, 4, 9, 16]);
     }
 }
