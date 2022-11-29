@@ -173,7 +173,7 @@ mod tests {
     use itertools::assert_equal;
 
     #[test]
-    fn test_scan_not_what_i_want() {
+    fn test_scan_while() {
         assert_equal(
             vec![1, 1, 1]
                 .into_iter()
@@ -199,6 +199,7 @@ mod tests {
         assert_equal(vec![1].into_iter().prescan(0, |x, y| x + y), 0..=1);
         assert_equal(vec![1, 1, 1].into_iter().prescan(0, |x, y| x + y), 0..=3);
         assert_equal((1..=5).prescan(0, |x, y| x + y), vec![0, 1, 3, 6, 10, 15]);
+        assert_equal((1..=5).prescan(0, |x, y| x + y).skip(2), vec![3, 6, 10, 15]);
     }
 
     #[test]
@@ -208,7 +209,7 @@ mod tests {
     }
 
     #[test]
-    fn test_drop_rev() {
+    fn test_drop_last() {
         assert_equal((1..4).drop_last(), vec![1, 2]);
         assert_equal((1..5).drop_last(), vec![1, 2, 3]);
     }
