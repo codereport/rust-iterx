@@ -1,4 +1,4 @@
-use std::iter::{Map, Scan, Zip};
+use std::iter::{Map, Scan, Take, Zip};
 
 #[cfg(test)]
 use std::ops::Add;
@@ -19,14 +19,15 @@ fn w<T: Copy, O>(binop: &dyn Fn(T, T) -> O) -> impl Fn(T) -> O + '_ {
 // 1. Figure out &Add::add
 // 2. Use in rust-tx
 
-// pub trait Iterx : Iterator {
-//     ✅ fn scan_while(self, f: F) {}
-//     ✅ fn scan_(self, f: F) {}
-//     fn prescan_while(self, init: T, f: F) {}
-//     ✅ fn prescan(self, init: T, f: F) {}
-// }
+pub trait Iterx: Iterator + Clone {
+    fn drop_last(self) -> Take<Self>
+    where
+        Self: Sized,
+    {
+        let m = self.clone().count() - 1;
+        self.take(m)
+    }
 
-pub trait Iterx: Iterator {
     /// * Name scan_ so as to not collide with [`scan`][std::iter::Iterator::scan]
     /// * [`scan`][std::iter::Iterator::scan] has been renamed in this library to
     fn scan_<F>(self, f: F) -> Scan_<Self, Self::Item, F>
@@ -74,7 +75,7 @@ pub trait Iterx: Iterator {
     }
 }
 
-impl<T: ?Sized> Iterx for T where T: Iterator {}
+impl<T: ?Sized + std::clone::Clone> Iterx for T where T: Iterator {}
 
 #[derive(Clone)]
 pub struct Prescan<I, St, F> {
@@ -204,5 +205,11 @@ mod tests {
     fn test_zip_map() {
         assert_equal((1..5).zip_map(1..5, |a, b| a + b), vec![2, 4, 6, 8]);
         assert_equal((1..5).zip_map(1..5, |a, b| a * b), vec![1, 4, 9, 16]);
+    }
+
+    #[test]
+    fn test_drop_rev() {
+        assert_equal((1..4).drop_last(), vec![1, 2]);
+        assert_equal((1..5).drop_last(), vec![1, 2, 3]);
     }
 }
