@@ -27,18 +27,17 @@ fn w<T: Copy, O>(binop: &dyn Fn(T, T) -> O) -> impl Fn(T) -> O + '_ {
 // }
 
 pub trait Iterx: Iterator {
-    // Name scan_ so as to not collide with std::iter::Iterator::scan
-    // std::iter::Iterator::scan should really be scan_while
+    /// * Name scan_ so as to not collide with [`scan`][std::iter::Iterator::scan]
+    /// * [`scan`][std::iter::Iterator::scan] has been renamed in this library to
     fn scan_<F>(self, f: F) -> Scan_<Self, Self::Item, F>
     where
         Self: Sized,
         F: FnMut(&Self::Item, &Self::Item) -> Self::Item,
-        // F: FnMut(&Self::Item, &Self::Item) -> Self::Item,
     {
         Scan_::new(self, f)
     }
 
-    // A renaming of https://doc.rust-lang.org/src/core/iter/traits/iterator.rs.html#1420
+    /// * A renaming of [`scan`][std::iter::Iterator::scan]
     fn scan_while<St, B, F>(self, initial_state: St, f: F) -> Scan<Self, St, F>
     where
         Self: Sized,
@@ -47,6 +46,7 @@ pub trait Iterx: Iterator {
         self.scan(initial_state, f)
     }
 
+    /// * The analog to `scan_` that takes an initial value.
     fn prescan<St, F>(self, initial_state: St, f: F) -> Prescan<Self, St, F>
     where
         Self: Sized,
@@ -55,6 +55,7 @@ pub trait Iterx: Iterator {
         Prescan::new(self, initial_state, f)
     }
 
+    /// * Fusion of [`map`][std::iter::Iterator::map] and [`zip`][std::iter::Iterator::zip] for convenience
     fn zip_map<U, T, F>(
         self,
         other: U,
