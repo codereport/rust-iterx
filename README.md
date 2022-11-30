@@ -17,6 +17,15 @@
 
 `iterx` is a [Rust](https://rust-lang.org/) library that provides several functions on the [`Iterator`](https://doc.rust-lang.org/1.64.0/core/iter/trait.Iterator.html) trait not found in [`std::iter`](https://doc.rust-lang.org/1.64.0/core/iter/) or the [`Itertools`](https://docs.rs/itertools/latest/itertools/) crate.
 
+How to use with Cargo:
+```toml
+[dependencies]
+iterx = "0.0.5"
+```
+How to use in your crate:
+```rs
+use iterx::Iterx;
+```
 Current functions provided:
 
 * [`drop_last`](https://docs.rs/iterx/latest/iterx/trait.Iterx.html#method.drop_last)
