@@ -1,7 +1,7 @@
 use std::iter::{Map, Scan, Take, Zip};
 
 #[cfg(test)]
-use std::ops::Add;
+use std::ops::{Add, Mul};
 
 pub fn option_lift<T: Copy>(f: &dyn Fn(&mut T, T) -> T) -> impl Fn(&mut T, T) -> Option<T> + '_ {
     |acc, x| {
@@ -190,6 +190,7 @@ mod tests {
     #[test]
     fn test_scan_() {
         assert_equal(vec![1].into_iter().scan_(|x, y| x + y), 1..2);
+        // assert_equal(vec![1].into_iter().scan_(&Add::add), 1..2); TODO
         assert_equal(vec![1, 1, 1].into_iter().scan_(|x, y| x + y), 1..=3);
         assert_equal((1..=5).scan_(|x, y| x + y), vec![1, 3, 6, 10, 15]);
     }
@@ -205,7 +206,9 @@ mod tests {
     #[test]
     fn test_zip_map() {
         assert_equal((1..5).zip_map(1..5, |a, b| a + b), vec![2, 4, 6, 8]);
+        assert_equal((1..5).zip_map(1..5, &Add::add), vec![2, 4, 6, 8]);
         assert_equal((1..5).zip_map(1..5, |a, b| a * b), vec![1, 4, 9, 16]);
+        assert_equal((1..5).zip_map(1..5, &Mul::mul), vec![1, 4, 9, 16]);
     }
 
     #[test]
