@@ -209,6 +209,8 @@ mod tests {
         assert_equal((1..5).zip_map(1..5, &Add::add), vec![2, 4, 6, 8]);
         assert_equal((1..5).zip_map(1..5, |a, b| a * b), vec![1, 4, 9, 16]);
         assert_equal((1..5).zip_map(1..5, &Mul::mul), vec![1, 4, 9, 16]);
+        assert_equal((1..5).zip_map(2..6, &std::cmp::max), 2..6);
+        assert_equal((1..5).zip_map(2..6, &std::cmp::min), 1..5);
     }
 
     #[test]
