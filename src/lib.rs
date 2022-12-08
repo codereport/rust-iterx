@@ -33,7 +33,7 @@ pub trait Iterx: Iterator + Clone {
     fn scan_<F>(self, f: F) -> Scan_<Self, Self::Item, F>
     where
         Self: Sized,
-        F: FnMut(&Self::Item, &Self::Item) -> Self::Item,
+        F: FnMut(&Self::Item, Self::Item) -> Self::Item,
     {
         Scan_::new(self, f)
     }
@@ -142,7 +142,7 @@ where
 impl<I, T, F> Iterator for Scan_<I, T, F>
 where
     I: Iterator<Item = T>,
-    F: FnMut(&T, &T) -> T,
+    F: FnMut(&T, T) -> T,
 {
     type Item = T;
 
@@ -155,7 +155,7 @@ where
         let state = self.state.take()?;
 
         if let Some(x) = self.iter.next() {
-            self.state = Some((self.f)(&state, &x));
+            self.state = Some((self.f)(&state, x));
         }
 
         Some(state)
