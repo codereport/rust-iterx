@@ -51,7 +51,7 @@ pub trait Iterx: Iterator + Clone {
     fn prescan<St, F>(self, initial_state: St, f: F) -> Prescan<Self, St, F>
     where
         Self: Sized,
-        F: FnMut(&St, &Self::Item) -> St,
+        F: FnMut(&St, Self::Item) -> St,
     {
         Prescan::new(self, initial_state, f)
     }
@@ -97,7 +97,7 @@ impl<I, St, F> Prescan<I, St, F> {
 impl<I, St, F> Iterator for Prescan<I, St, F>
 where
     I: Iterator,
-    F: FnMut(&St, &I::Item) -> St,
+    F: FnMut(&St, I::Item) -> St,
 {
     type Item = St;
 
@@ -105,7 +105,7 @@ where
         let state = self.state.take()?;
 
         if let Some(x) = self.iter.next() {
-            self.state = Some((self.f)(&state, &x));
+            self.state = Some((self.f)(&state, x));
         }
 
         Some(state)
