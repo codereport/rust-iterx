@@ -20,7 +20,7 @@
 How to use with Cargo:
 ```toml
 [dependencies]
-iterx = "0.0.7"
+iterx = "0.0.8"
 ```
 How to use in your crate:
 ```rs
@@ -29,6 +29,7 @@ use iterx::Iterx;
 Current functions provided:
 
 * [`drop_last`](https://docs.rs/iterx/latest/iterx/trait.Iterx.html#method.drop_last)
+* [`mark_last`](https://docs.rs/iterx/latest/iterx/trait.Iterx.html#method.mark_last)
 * [`prescan`](https://docs.rs/iterx/latest/iterx/trait.Iterx.html#method.prescan)
 * [`scan_`](https://docs.rs/iterx/latest/iterx/trait.Iterx.html#method.scan_)
 * [`scan_while`](https://docs.rs/iterx/latest/iterx/trait.Iterx.html#method.scan_while)

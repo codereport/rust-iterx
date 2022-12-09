@@ -28,6 +28,10 @@ pub trait Iterx: Iterator + Clone {
         self.take(m)
     }
 
+    fn mark_last(self) -> MarkLast<Self> {
+        MarkLast(false, self.peekable())
+    }
+
     /// * Name scan_ so as to not collide with [`scan`][std::iter::Iterator::scan]
     /// * [`scan`][std::iter::Iterator::scan] has been renamed in this library to
     fn scan_<F>(self, f: F) -> Scan_<Self, Self::Item, F>
@@ -166,6 +170,21 @@ where
     }
 }
 
+pub struct MarkLast<I>(bool, std::iter::Peekable<I>)
+where
+    I: Iterator;
+
+impl<I> Iterator for MarkLast<I>
+where
+    I: Iterator,
+{
+    type Item = (bool, I::Item);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.1.next().map(|e| (self.1.peek().is_none(), e))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -217,5 +236,11 @@ mod tests {
     fn test_drop_last() {
         assert_equal((1..4).drop_last(), vec![1, 2]);
         assert_equal((1..5).drop_last(), vec![1, 2, 3]);
+    }
+
+    #[test]
+    fn test_mark_last() {
+        assert_equal((1..3).mark_last(), vec![(false, 1), (true, 2)]);
+        assert_equal((1..4).mark_last(), vec![(false, 1), (false, 2), (true, 3)]);
     }
 }
