@@ -51,6 +51,17 @@ pub trait Iterx: Iterator + Clone {
         self.scan(initial_state, f)
     }
 
+    /// * A convenience function for `std::iter::once(value).chain(self)`
+    fn prepend(
+        self,
+        value: Self::Item,
+    ) -> std::iter::Chain<std::iter::Once<<Self as Iterator>::Item>, Self>
+    where
+        Self: Sized,
+    {
+        std::iter::once(value).chain(self)
+    }
+
     /// * The analog to `scan_` that takes an initial value.
     fn prescan<St, F>(self, initial_state: St, f: F) -> Prescan<Self, St, F>
     where
@@ -60,7 +71,7 @@ pub trait Iterx: Iterator + Clone {
         Prescan::new(self, initial_state, f)
     }
 
-    /// * Fusion of [`map`][std::iter::Iterator::map] and [`zip`][std::iter::Iterator::zip] for convenience
+    /// * A convenience function that fuses [`map`][std::iter::Iterator::map] and [`zip`][std::iter::Iterator::zip]
     fn zip_map<U, T, F>(
         self,
         other: U,
@@ -236,6 +247,12 @@ mod tests {
     fn test_drop_last() {
         assert_equal((1..4).drop_last(), vec![1, 2]);
         assert_equal((1..5).drop_last(), vec![1, 2, 3]);
+    }
+
+    #[test]
+    fn test_prepend() {
+        assert_equal((1..4).prepend(0), 0..4);
+        assert_equal((2..5).prepend(1), 1..5);
     }
 
     #[test]
