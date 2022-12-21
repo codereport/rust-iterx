@@ -37,7 +37,7 @@ pub trait Iterx: Iterator + Clone {
     fn scan_<F>(self, f: F) -> Scan_<Self, Self::Item, F>
     where
         Self: Sized,
-        F: FnMut(&Self::Item, Self::Item) -> Self::Item,
+        F: FnMut(Self::Item, Self::Item) -> Self::Item,
     {
         Scan_::new(self, f)
     }
@@ -66,7 +66,7 @@ pub trait Iterx: Iterator + Clone {
     fn prescan<St, F>(self, initial_state: St, f: F) -> Prescan<Self, St, F>
     where
         Self: Sized,
-        F: FnMut(&St, Self::Item) -> St,
+        F: FnMut(St, Self::Item) -> St,
     {
         Prescan::new(self, initial_state, f)
     }
@@ -109,10 +109,10 @@ impl<I, St, F> Prescan<I, St, F> {
     }
 }
 
-impl<I, St, F> Iterator for Prescan<I, St, F>
+impl<I, St: Clone, F> Iterator for Prescan<I, St, F>
 where
     I: Iterator,
-    F: FnMut(&St, I::Item) -> St,
+    F: FnMut(St, I::Item) -> St,
 {
     type Item = St;
 
@@ -120,7 +120,7 @@ where
         let state = self.state.take()?;
 
         if let Some(x) = self.iter.next() {
-            self.state = Some((self.f)(&state, x));
+            self.state = Some((self.f)(state.clone(), x));
         }
 
         Some(state)
@@ -154,10 +154,10 @@ where
     }
 }
 
-impl<I, T, F> Iterator for Scan_<I, T, F>
+impl<I, T: Clone, F> Iterator for Scan_<I, T, F>
 where
     I: Iterator<Item = T>,
-    F: FnMut(&T, T) -> T,
+    F: FnMut(T, T) -> T,
 {
     type Item = T;
 
@@ -170,7 +170,7 @@ where
         let state = self.state.take()?;
 
         if let Some(x) = self.iter.next() {
-            self.state = Some((self.f)(&state, x));
+            self.state = Some((self.f)(state.clone(), x));
         }
 
         Some(state)

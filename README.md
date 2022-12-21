@@ -20,7 +20,7 @@
 How to use with Cargo:
 ```toml
 [dependencies]
-iterx = "0.0.9"
+iterx = "0.0.10"
 ```
 How to use in your crate:
 ```rs
